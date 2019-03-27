@@ -4,6 +4,7 @@ groups:
   nginx:
     - vpn-wanze
   nonode: []
+  nocjdns: []
 
 config:
   dataDirectory: '/var/lib/vpn-wanze'
