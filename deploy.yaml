@@ -1,0 +1,9 @@
+groups:
+  web:
+    - vpn-wanze
+  nginx:
+    - vpn-wanze
+  nonode: []
+
+config:
+  dataDirectory: '/var/lib/vpn-wanze'
