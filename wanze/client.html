@@ -1,0 +1,37 @@
+<html>
+
+<head>
+  <title>VPN-Wanze Client ${PEER_CJD}</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+  <h1>VPN-Wanze VPN Dienst</h1>
+
+  <h2>Dieser Client (${PEER_CJD}) ist Authorisiert den VPN-Wanze Dienst verwenden zu können</h2>
+  <hr>
+
+  <h3><b>Client-Konfiguration</b></h3>
+
+  <p>Im VPN-Wanze Client mit dem Server <tt>${LOCAL_CJD}</tt> verbinden</p>
+
+  <h3><b>Manuelle Konfiguration</b></h3>
+
+  <p><b>CJDNS:</b> Wenn Sie diese Seite aufrufen können, dann ist diese Programm bereits korrekt Konfiguriert</p>
+
+  <p><b>WireGuard:</b> Folgende Konfiguration muss eingetragen werden</p>
+
+<div style="background: #afafaf">
+<tt>
+[Interface]<br>
+PrivateKey = PRIVATERSCHLÜSSELMUSSHIEREINGETRAGENWERDEN<br>
+Address = 10.8.1.${PEER_V4ID}/24, fd80:8888:8888::${PEER_V6ID}/64<br>
+<br>
+[Peer]<br>
+PublicKey = ${WG_PUB}<br>
+Endpoint = [${LOCAL_CJD}]:4999<br>
+AllowedIPs = 10.8.1.0/24, fd80:8888:8888::/64, SUBNETZEAUFDIEZUGEGRIFFENWERDENSOLLHIEREINTRAGEN
+</tt>
+</div>
+</body>
+

@@ -62,8 +62,9 @@ setup_cjdns() {
 
 wg_genconf() {
   if ! _db_exists wg_priv; then
-    _db wg_priv
-    _db wg_pub
+    WG_PRIV=$(wg genkey)
+    _db wg_priv "$WG_PRIV"
+    _db wg_pub "$(echo "$WG_PRIV" | wg pubkey)"
   fi
 
   _db_get wg_priv
@@ -78,7 +79,7 @@ wg_genconf() {
     pushdb "$peer"
     echo "[Peer]"
     _db_get peer_wgpub
-    echo "PublicKey = $PEER_WGPUBQ"
+    echo "PublicKey = $PEER_WGPUB"
     echo "AllowedIPs = 10.8.1.0/24, fd80:8888:8888::/64"
   done
 }
@@ -111,8 +112,6 @@ add() {
   mv "$DB" "/tmp/newclient"
   popdb
 
-  
-
   OUTF="/var/wanze/clients/$PEER_NAME"
   mkdir -p "$OUTF"
   mv "$DB" "$OUTF/db"
@@ -121,11 +120,7 @@ add() {
 setup() {
   setup_net
 
-  # prompt email "E-Mail für Zertifikatsablaufbenarichtigungen"
-  prompt domain "Haupt Domain-Name (z.B. ihre-schule.de)"
-  prompt ip "paedML Ziel-Server IP-Addresse oder DNS (IPv6 Addressen umklammert angeben)"
-  prompt sub "Subdomains (mit leerzeichen getrennt angeben)" "server mail vibe filr"
-  prompt usemain "Maindomain verwenden (j=ja, n=nein)" j
+  prompt ""
 
   setup_web
 
