@@ -1,1 +1,0 @@
-../node_modules/mkg-infra/ssl/tool.sh
