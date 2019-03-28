@@ -1,0 +1,2 @@
+include:
+ - remote: 'https://raw.githubusercontent.com/mkg20001/packer-vm-template/master/.gitlab-ci.yml'
