@@ -140,9 +140,6 @@ add() {
 
 setup() {
   setup_net
-
-  prompt ""
-
   setup_wireguard
   setup_web
   gen_webroots
