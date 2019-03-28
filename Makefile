@@ -1,7 +1,7 @@
 build:
-	make -C ./shared build
+	VM_NAME=vpn-wanze make -C ./shared build
 dist:
-	make -C ./shared dist
+	VM_NAME=vpn-wanze make -C ./shared dist
 
 prepare:
 	touch /tmp/g
