@@ -111,12 +111,14 @@ gen_webroots() {
 
 setup_wireguard() {
   i "Stoppe WireGuard Dienst..."
-  # TODO: check if wanze0 on and stop
+  if systemctl is-active --quiet wg-quick@wanze0; then
+    wg-quick down wanze0
+  fi
   i "Aktualisiere Konfiguration..."
   wg_genconf > /etc/wireguard/wanze0.conf
   i "Starte WireGuard Dienst..."
   wg-quick up wanze0
-  # TODO: setup systemd autostart
+  systemctl enable wg-quick@wanze0
 }
 
 add() {

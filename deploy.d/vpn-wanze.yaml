@@ -1,0 +1,13 @@
+affects: *
+
+modules:
+  link:
+    wanze/bin.sh: /usr/bin/wanze
+    shared/scripts/update-bin.sh: /usr/bin/wanze-update
+  pkg:
+    - wireguard
+lifecycle:
+  install.pre: |
+    add-apt-repository -y ppa:wireguard/wireguard
+  install.post: |
+    rm -v /etc/cjdroute.conf
