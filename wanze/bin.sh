@@ -2,6 +2,8 @@
 
 set -e
 
+shopt -s nullglob
+
 MAIN=$(dirname $(dirname $(readlink -f $0)))
 SHARED="$MAIN/shared"
 
@@ -33,7 +35,7 @@ status() {
   wg
 }
 
-setup_cjdns() {
+setup_cjdns() { # TODO: rework using old cjdns conf patch code
   if [ ! -e "/etc/cjdroute.conf" ]; then
     prompt cjd_custom "Eigenen CJDNS Knoten verwenden" "n" "yesno"
 
@@ -103,17 +105,15 @@ gen_webroots() {
   for peer in /var/wanze/clients/*/db; do
     pushdb "$peer"
     _db_get peer_cjd
-    mkdir "/var/wanze/www/$peer_cjd"
-    envsubst <"$MAIN/wanze/client.html" > "/var/wanze/www/$peer_cjd/index.html"
-    envsubst <"$MAIN/wanze/client.json" > "/var/wanze/www/$peer_cjd/myconf.json"
+    mkdir "/var/wanze/www/$PEER_CJD"
+    envsubst <"$MAIN/wanze/client.html" > "/var/wanze/www/$PEER_CJD/index.html"
+    envsubst <"$MAIN/wanze/client.json" > "/var/wanze/www/$PEER_CJD/myconf.json"
   done
 }
 
 setup_wireguard() {
   i "Stoppe WireGuard Dienst..."
-  if systemctl is-active --quiet wg-quick@wanze0; then
-    wg-quick down wanze0
-  fi
+  wg-quick down wanze0 || /bin/true # TODO: make better
   i "Aktualisiere Konfiguration..."
   wg_genconf > /etc/wireguard/wanze0.conf
   i "Starte WireGuard Dienst..."
@@ -130,21 +130,26 @@ add() {
   popdb
 
   # TODO: other stuff
-  ufw allow port 4999 proto udp from "$PEER_CJD" comment "Client $PEER_NAME"
-  ufw allow port 19999 proto tcp from "$PEER_CJD" comment "Netdata $PEER_NAME"
+  ufw allow from "$PEER_CJD" to any port 4999 proto udp comment "Client $PEER_NAME"
+  ufw allow from "$PEER_CJD" to any port 19999 proto tcp comment "Netdata $PEER_NAME"
 
   OUTF="/var/wanze/clients/$PEER_NAME"
   mkdir -p "$OUTF"
   mv "/tmp/newclient" "$OUTF/db"
 
+  setup_wireguard
+  setup_webroots
+}
+
+setup_web() {
   gen_webroots
 }
 
 setup() {
   setup_net
+  setup_cjdns
   setup_wireguard
   setup_web
-  gen_webroots
 
   echo "[!] Fertig"
 }
