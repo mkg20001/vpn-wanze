@@ -8,7 +8,5 @@ modules:
   pkg:
     - wireguard
 lifecycle:
-  install.pre: |
-    add-apt-repository -y ppa:wireguard/wireguard
   install.post: |
     rm -v /etc/cjdroute.conf

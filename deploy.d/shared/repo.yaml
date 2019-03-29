@@ -1,0 +1,9 @@
+affects:
+ - '*'
+
+modules:
+  pkg:
+   - software-properties-common
+
+lifecycle:
+  install.post: add-apt-repository -y ppa:wireguard/wireguard
