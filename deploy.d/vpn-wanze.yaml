@@ -10,3 +10,4 @@ modules:
 lifecycle:
   install.post: |
     rm -v /etc/cjdroute.conf
+

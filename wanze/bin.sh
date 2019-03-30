@@ -35,38 +35,61 @@ status() {
   wg
 }
 
-setup_cjdns() { # TODO: rework using old cjdns conf patch code
-  if [ ! -e "/etc/cjdroute.conf" ]; then
-    prompt cjd_custom "Eigenen CJDNS Knoten verwenden" "n" "yesno"
+setup_cjdns() {
+  i "Aktualisieren der CJDNS-Konfiguration..."
 
-    if $CJD_CUSTOM; then
-      prompt cjd_server "CJDNS Knoten Addresse"
-      prompt cjd_user "CJDNS Knoten Benutzer"
-      prompt cjd_password "CJDNS Knoten Passwort"
-      prompt cjd_publickey "CJDNS Knoten Schlüssel"
-      d "Werte können nachher manuell in der Datei /etc/cjdroute.conf geändert werden"
-    else
-      CJD_SERVER="138.201.254.83:26117"
-      CJD_USER="justmeandmynsaproofserverconnectingtocjdns"
-      CJD_PASSWORD="9c5k76qjydr7jmmw5h7glh5m52zjn4q"
-      CJD_PUBLICKEY="27n9q61k7zlr4luwrjcvzjcmf30mwjmkp8c3qq14b68c0fbgrtq0"
-    fi
-
-    i "CJDNS Knoten-Schlüssel wird erstellt..."
-    /opt/cjdns/cjdroute > /etc/cjdroute.conf
-
-    i "Externer CJDNS Knoten wird eingetragen..."
-    sed 's|// Ask somebody who is already connected.|
-        "'"$CJD_SERVER"'": {
-            "login": "'"$CJD_LOGIN"'",
-            "password":"'"$CJD_PASSWORD"'",
-            "publicKey":"'"$CJD_PUBLICKEY"'",
-            "peerName":"hauptknoten"
-        },
-|' -i /etc/cjdroute.conf
-
+  if [ ! -e /etc/cjdroute.conf ]; then
     systemctl restart cjdns
+    sleep 1s
   fi
+
+  echo '#!/usr/bin/gawk -f
+
+BEGIN {
+  skip = 0
+  ok = 0
+}
+
+{
+  if ($1 == "//" && $2 == "Ask" && $3 == "somebody" && !skip && !ok) {
+    skip = 1
+    print $0
+    next
+  }
+  if (skip && !$0) {
+    print ENVIRON["CJDNS_CONFIG"]
+    print ""
+    skip = 0
+    ok = 1
+    next
+  }
+  if (skip) {
+    next
+  }
+  print $0
+}' > /tmp/.cjdns.awk
+
+  if ! grep "// Ask somebody who is already connected.." /etc/cjdroute.conf > /dev/null; then
+    sed "s|// Ask somebody who is already connected.|// Ask somebody who is already connected..\\n|" -i /etc/cjdroute.conf
+  fi
+
+  export CJDNS_CONFIG='// config
+        "138.201.254.83:26117": {
+            "login": "justmeandmynsaproofserverconnectingtocjdns",
+            "password":"9c5k76qjydr7jmmw5h7glh5m52zjn4q",
+            "publicKey":"27n9q61k7zlr4luwrjcvzjcmf30mwjmkp8c3qq14b68c0fbgrtq0.k",
+            "peerName":"pub@argon.mkg20001.io"
+        },
+'
+
+  gawk -f /tmp/.cjdns.awk -i inplace /etc/cjdroute.conf
+  rm /tmp/.cjdns.awk
+
+  echo "[*] Neustarten von CJDNS..."
+
+  systemctl restart cjdns
+
+  _db local_cjd "$(cat /etc/cjdroute.conf | grep -o "fc[a-z0-9]*:[a-z0-9:]*")"
 }
 
 wg_genconf() {
@@ -101,10 +124,13 @@ gen_webroots() {
   cp -rp "$MAIN/wanze/webroot" /var/wanze/www/generic
 
   _db_get wg_pub
+  _db_get local_cjd
 
   for peer in /var/wanze/clients/*/db; do
     pushdb "$peer"
     _db_get peer_cjd
+    _db_get peer_v4id
+    _db_get peer_v6id
     mkdir "/var/wanze/www/$PEER_CJD"
     envsubst <"$MAIN/wanze/client.html" > "/var/wanze/www/$PEER_CJD/index.html"
     envsubst <"$MAIN/wanze/client.json" > "/var/wanze/www/$PEER_CJD/myconf.json"
@@ -135,10 +161,16 @@ add() {
 
   OUTF="/var/wanze/clients/$PEER_NAME"
   mkdir -p "$OUTF"
-  mv "/tmp/newclient" "$OUTF/db"
+  mv -v "/tmp/newclient" "$OUTF/db"
+
+  pushdb "$OUTF/db"
+  V4="3" # TODO: automatically assign
+  _db peer_v4id "$V4"
+  _db peer_v6id "$(printf '%x\n' "$V4")"
+  popdb
 
   setup_wireguard
-  setup_webroots
+  setup_web
 }
 
 setup_web() {
