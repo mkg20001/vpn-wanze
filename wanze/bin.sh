@@ -39,6 +39,7 @@ setup_cjdns() {
   if [ ! -e /usr/bin/cjdroute ]; then
     i "Kompiliere CJDNS für diesen Server..."
     cd /opt/cjdns
+    git clean -dxf
     ./do
     cp /opt/cjdns/cjdroute /usr/bin/cjdroute
     cd "$MAIN"
