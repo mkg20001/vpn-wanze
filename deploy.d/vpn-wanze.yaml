@@ -7,6 +7,7 @@ modules:
     shared/scripts/update-bin.sh: /usr/bin/wanze-update
   pkg:
     - wireguard
+    - gawk
 lifecycle:
   install.post: |
     rm -v /etc/cjdroute.conf
