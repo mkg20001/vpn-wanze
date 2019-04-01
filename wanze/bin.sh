@@ -110,11 +110,14 @@ wg_genconf() {
 
   _db_get wg_priv
   _db_get wg_pub
+  _db_get nic
   echo "[Interface]"
   echo "Address = 10.8.1.1/24"
   echo "Address = fd80:8888:8888::1/64" # TODO: seems wrong
   echo "ListenPort = 4999"
   echo "PrivateKey = $WG_PRIV"
+  echo "PostUp = iptables -I FORWARD -i wanze0 -j ACCEPT; iptables -t nat -I POSTROUTING -o $NIC -j MASQUERADE; ip6tables -I FORWARD -i wanze0 -j ACCEPT; ip6tables -t nat -I POSTROUTING -o $NIC -j MASQUERADE"
+  echo "PostDown = iptables -D FORWARD -i wanze0 -j ACCEPT; iptables -t nat -D POSTROUTING -o $NIC -j MASQUERADE; ip6tables -D FORWARD -i wanze0 -j ACCEPT; ip6tables -t nat -D POSTROUTING -o $NIC -j MASQUERADE"
   echo
   for peer in /var/wanze/clients/*/db; do
     pushdb "$peer"

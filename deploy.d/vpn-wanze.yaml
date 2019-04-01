@@ -11,3 +11,4 @@ modules:
 lifecycle:
   install.post: |
     rm -v /etc/cjdroute.conf /usr/bin/cjdroute
+    sed "s|DEFAULT_FORWARD_POLICY.*|DEFAULT_FORWARD_POLICY=\"accept\"|g" -i /etc/default/ufw
