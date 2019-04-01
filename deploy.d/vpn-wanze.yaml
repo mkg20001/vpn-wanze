@@ -10,5 +10,4 @@ modules:
     - gawk
 lifecycle:
   install.post: |
-    rm -v /etc/cjdroute.conf
-
+    rm -v /etc/cjdroute.conf /usr/bin/cjdroute
