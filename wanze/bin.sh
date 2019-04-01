@@ -122,6 +122,7 @@ wg_genconf() {
     _db_get peer_wgpub
     echo "PublicKey = $PEER_WGPUB"
     echo "AllowedIPs = 10.8.1.0/24, fd80:8888:8888::/64"
+    popdb
   done
 }
 
@@ -143,6 +144,7 @@ gen_webroots() {
     mkdir "/var/wanze/www/$PEER_CJD"
     envsubst <"$MAIN/wanze/client.html" > "/var/wanze/www/$PEER_CJD/index.html"
     envsubst <"$MAIN/wanze/client.json" > "/var/wanze/www/$PEER_CJD/myconf.json"
+    popdb
   done
 }
 
