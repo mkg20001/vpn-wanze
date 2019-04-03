@@ -125,7 +125,8 @@ wg_genconf() {
     echo "[Peer]"
     _db_get peer_wgpub
     echo "PublicKey = $PEER_WGPUB"
-    echo "AllowedIPs = 10.8.1.0/24, fd80:8888:8888::/64"
+    # echo "AllowedIPs = 10.8.1.0/24, fd80:8888:8888::/64" # TODO: figure out why this causes "RTNETLINK answers: No such device"
+    echo "AllowedIPs = 10.8.1.0/24"
     popdb
   done
 }
