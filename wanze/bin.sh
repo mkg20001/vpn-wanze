@@ -223,9 +223,17 @@ setup() {
   echo "[!] Fertig"
 }
 
+refresh() {
+  i "Aktualisiere..."
+  setup_cjdns
+  setup_wireguard
+  setup_web
+  d "Fertig"
+}
+
 main() {
   case "$1" in
-    setup|status|gen_webroots|add|rm|list|help)
+    setup|status|add|rm|list|refresh|help)
       "$@"
       ;;
     *)
