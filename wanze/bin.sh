@@ -118,6 +118,7 @@ wg_genconf() {
   echo "PrivateKey = $WG_PRIV"
   echo "PostUp = iptables -I FORWARD -i wanze0 -j ACCEPT; iptables -t nat -I POSTROUTING -o $NIC -j MASQUERADE; ip6tables -I FORWARD -i wanze0 -j ACCEPT; ip6tables -t nat -I POSTROUTING -o $NIC -j MASQUERADE"
   echo "PostDown = iptables -D FORWARD -i wanze0 -j ACCEPT; iptables -t nat -D POSTROUTING -o $NIC -j MASQUERADE; ip6tables -D FORWARD -i wanze0 -j ACCEPT; ip6tables -t nat -D POSTROUTING -o $NIC -j MASQUERADE"
+  echo "MTU = 1224" # seems to be just right for CJDNS + WG
   echo
   for peer in /var/wanze/clients/*/db; do
     pushdb "$peer"

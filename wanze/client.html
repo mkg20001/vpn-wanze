@@ -26,6 +26,8 @@
 [Interface]<br>
 PrivateKey = PRIVATERSCHLÜSSELMUSSHIEREINGETRAGENWERDEN<br>
 Address = 10.8.1.${PEER_V4ID}/24, fd80:8888:8888::${PEER_V6ID}/64<br>
+MTU = 1224<br>
+<!-- PersistentKeepalive = 25 isn't needed since we're going over CJDNS anyways -->
 <br>
 [Peer]<br>
 PublicKey = ${WG_PUB}<br>
