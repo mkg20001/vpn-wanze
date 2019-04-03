@@ -162,6 +162,27 @@ setup_wireguard() {
   systemctl enable wg-quick@wanze0
 }
 
+assign_address() {
+  ASSIGNED=()
+
+  for peer in /var/wanze/clients/*/db; do
+    pushdb "$peer"
+    _db_get peer_v4id
+    ASSIGNED+=("$PEER_V4ID")
+    popdb
+  done
+  
+  for i in $(seq 2 254); do
+    if ! contains "$i" "${ASSIGNED[@]}"; then
+      echo "$i"
+      return 0
+    fi
+  done
+
+  o "FAILED TO ASSIGN ADDRESS - TOO MANY CLIENTS" >&2
+  return 2
+}
+
 add() {
   pushdb
   prompt peer_name "Name" "$1"
@@ -179,7 +200,7 @@ add() {
   mv -v "/tmp/newclient" "$OUTF/db"
 
   pushdb "$OUTF/db"
-  V4="3" # TODO: automatically assign
+  V4="$(assign_address)"
   _db peer_v4id "$V4"
   _db peer_v6id "$(printf '%x\n' "$V4")"
   popdb
