@@ -11,4 +11,6 @@ modules:
 lifecycle:
   install.post: |
     rm -v /etc/cjdroute.conf /usr/bin/cjdroute
-    sed "s|DEFAULT_FORWARD_POLICY.*|DEFAULT_FORWARD_POLICY=\"accept\"|g" -i /etc/default/ufw
+    sed "s|DEFAULT_FORWARD_POLICY.*|DEFAULT_FORWARD_POLICY=\"ACCEPT\"|g" -i /etc/default/ufw
+    port=$(sudo cat /etc/cjdroute.conf | grep "bind" | grep "0.0.0.0" | grep "[0-9][0-9][0-9]*" -o)
+    ufw delete allow "$port/udp"

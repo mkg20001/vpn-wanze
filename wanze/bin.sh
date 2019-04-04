@@ -50,6 +50,8 @@ setup_cjdns() {
   if [ ! -e /etc/cjdroute.conf ]; then
     systemctl restart cjdns
     sleep 1s
+    port=$(sudo cat /etc/cjdroute.conf | grep "bind" | grep "0.0.0.0" | grep "[0-9][0-9][0-9]*" -o)
+    ufw allow "$port/udp" comment CJDNS
   fi
 
   echo '#!/usr/bin/gawk -f
