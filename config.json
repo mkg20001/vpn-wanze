@@ -5,6 +5,7 @@
     "nginx",
     "node",
     "tools",
-    "cjdns"
+    "cjdns",
+    "console"
   ]
 }
